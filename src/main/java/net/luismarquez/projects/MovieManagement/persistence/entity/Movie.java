@@ -1,6 +1,7 @@
 package net.luismarquez.projects.MovieManagement.persistence.entity;
 
 import jakarta.persistence.*;
+import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 
 import java.util.List;
 
@@ -16,7 +17,8 @@ public class Movie {
     @Column(nullable = false)
     private String director;
 
-    private String genre;
+    @Enumerated(EnumType.STRING)
+    private MovieGenre genre;
 
     private int releaseYear;
 
@@ -47,11 +49,11 @@ public class Movie {
         this.director = director;
     }
 
-    public String getGenre() {
+    public MovieGenre getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
+    public void setGenre(MovieGenre genre) {
         this.genre = genre;
     }
 
