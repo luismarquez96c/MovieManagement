@@ -1,9 +1,14 @@
 package net.luismarquez.projects.MovieManagement.controller;
 
+import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import net.luismarquez.projects.MovieManagement.service.MovieService;
 import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +24,8 @@ public class MovieController {
 
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Movie> findAll(@RequestParam(required = false) String title,
-                               @RequestParam(required = false) MovieGenre genre){
+    public ResponseEntity<List<Movie>> findAll(@RequestParam(required = false) String title,
+                                  @RequestParam(required = false) MovieGenre genre){
 
         List<Movie> peliculas = null;
 
@@ -34,37 +39,20 @@ public class MovieController {
             peliculas = movieService.findAll();
         }
 
-        return peliculas;
+
+//        HttpHeaders headers = new HttpHeaders();
+//        return new ResponseEntity(peliculas, headers, HttpStatus.OK);//Opción 1
+//        return ResponseEntity.status(HttpStatus.OK).body(peliculas);//Opción 2
+        return ResponseEntity.ok(peliculas);
     }
 
-//        @RequestMapping(method = RequestMethod.GET, params = {"title", "genre"})
-//        public List<Movie> findAllByGenreAndTitle(@RequestParam String title,
-//                                                @RequestParam MovieGenre genre){
-//            System.out.println("Metodo: findAllByGenreAndTitle");
-//            return movieService.findAllByGenreAndTitle(genre, title);
-//        }
-//
-//        @RequestMapping(method = RequestMethod.GET, params = "title")
-//        public List<Movie> findAllByTitle(@RequestParam String title){
-//            System.out.println("Metodo: findAllByTitle");
-//            return movieService.findAllByTitle(title);
-//        }
-//
-//        @RequestMapping(method = RequestMethod.GET, params = "genre")
-//        public List<Movie> findAllByGenre(@RequestParam MovieGenre genre){
-//            System.out.println("Metodo: findAllByGenre");
-//            return movieService.findAllByGenre(genre);
-//        }
-//
-//        @RequestMapping(method = RequestMethod.GET, params = {"!title","!genre"})
-//        public List<Movie> findAll(){
-//            System.out.println("Metodo: findAll");
-//            return movieService.findAll();
-//        }
-
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public Movie findOneById(@PathVariable Long id){
-        return movieService.findOneById(id);
+    public ResponseEntity<Movie> findOneById(@PathVariable Long id){
+        try {
+            return ResponseEntity.ok(movieService.findOneById(id));
+        }catch (ObjectNotFoundException exception){
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
