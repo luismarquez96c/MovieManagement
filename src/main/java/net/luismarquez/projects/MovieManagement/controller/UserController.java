@@ -77,10 +77,4 @@ public class UserController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAll(){
-        userService.deleteAll();
-        return ResponseEntity.noContent().build();
-    }
-
 }

@@ -12,7 +12,4 @@ public interface UserService {
     User saveOne(User user);
     User updateOneByUsername(String username, User user);
     void deleteOneByUsername(String username);
-
-    void deleteAll();
-
 }
