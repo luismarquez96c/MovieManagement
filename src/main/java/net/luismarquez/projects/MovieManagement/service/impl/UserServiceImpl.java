@@ -1,30 +1,41 @@
 package net.luismarquez.projects.MovieManagement.service.impl;
 
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
+import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import net.luismarquez.projects.MovieManagement.persistence.entity.User;
+import net.luismarquez.projects.MovieManagement.persistence.repository.MovieCrudRepository;
 import net.luismarquez.projects.MovieManagement.persistence.repository.UserCrudRepository;
 import net.luismarquez.projects.MovieManagement.service.UserService;
+import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserCrudRepository userCrudRepository;
 
+    @Autowired
+    private MovieCrudRepository movieCrudRepository;
+
+    @Transactional(readOnly = true)
     @Override
     public List<User> findAll() {
         return userCrudRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> findAllByName(String name) {
         return userCrudRepository.findByNameContaining(name);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User findOneByUsername(String username) {
         return userCrudRepository.findByUsername(username)
@@ -53,6 +64,18 @@ public class UserServiceImpl implements UserService {
         if(userCrudRepository.deleteByUsername(username) != 1){
             throw new ObjectNotFoundException("[user:" + username + "]");
         }
+    }
 
+    @Override
+    public void deleteAll() {
+        Movie movie = new Movie();
+        movie.setReleaseYear(2004);
+        movie.setGenre(MovieGenre.ACTION);
+        movie.setDirector("Sam Raimi");
+        movie.setTitle("Spider Man 2");
+
+        userCrudRepository.deleteAll();
+
+        movieCrudRepository.save(movie);
     }
 }
