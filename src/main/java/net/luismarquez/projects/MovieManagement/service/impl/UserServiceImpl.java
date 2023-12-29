@@ -1,6 +1,9 @@
 package net.luismarquez.projects.MovieManagement.service.impl;
 
+import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
+import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
+import net.luismarquez.projects.MovieManagement.mapper.UserMapper;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import net.luismarquez.projects.MovieManagement.persistence.entity.User;
 import net.luismarquez.projects.MovieManagement.persistence.repository.MovieCrudRepository;
@@ -25,35 +28,42 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<User> findAll() {
-        return userCrudRepository.findAll();
+    public List<GetUser> findAll() {
+        List<User> entites = userCrudRepository.findAll();
+        return UserMapper.toGetDtoList(entites);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<User> findAllByName(String name) {
-        return userCrudRepository.findByNameContaining(name);
+    public List<GetUser> findAllByName(String name) {
+        List<User> entities = userCrudRepository.findByNameContaining(name);
+        return UserMapper.toGetDtoList(entities);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public User findOneByUsername(String username) {
+    public GetUser findOneByUsername(String username) {
+        return UserMapper.toGetDto(this.findOneEntityByUsername(username));
+    }
+
+    @Transactional(readOnly = true)
+    private User findOneEntityByUsername(String username) {
         return userCrudRepository.findByUsername(username)
                 .orElseThrow( () -> new ObjectNotFoundException("[user:" + username + "]"));
     }
 
     @Override
-    public User saveOne(User user) {
-        return userCrudRepository.save(user);
+    public GetUser saveOne(SaveUser saveDto) {
+        User newUser = UserMapper.toEntity(saveDto);
+        return UserMapper.toGetDto(userCrudRepository.save(newUser));
     }
 
     @Override
-    public User updateOneByUsername(String username, User user) {
-        User oldUser = this.findOneByUsername(username);
-        oldUser.setName(user.getName());
-        oldUser.setPassword(user.getPassword());
+    public GetUser updateOneByUsername(String username, SaveUser saveDto) {
+        User oldUser = this.findOneEntityByUsername(username);
+        UserMapper.updateEntity(oldUser, saveDto);
 
-        return userCrudRepository.save(oldUser);
+        return UserMapper.toGetDto(userCrudRepository.save(oldUser));
     }
 
     @Override
