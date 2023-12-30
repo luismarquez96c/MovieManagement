@@ -1,6 +1,7 @@
 package net.luismarquez.projects.MovieManagement.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
@@ -11,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
@@ -45,8 +48,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<GetUser> createOne(@RequestBody SaveUser saveDto,
-                                          HttpServletRequest request){
+    public ResponseEntity<GetUser> createOne(@RequestBody @Valid SaveUser saveDto,
+                                          HttpServletRequest request) throws UnsupportedEncodingException {
 
         GetUser createdUser = userService.saveOne(saveDto);
         String baseURL = request.getRequestURL().toString();
@@ -57,7 +60,7 @@ public class UserController {
 
     @PutMapping(value = "/{username}")
     public ResponseEntity<GetUser> updateOneByUsername(@PathVariable String username,
-                                                    @RequestBody SaveUser saveDto){
+                                                    @RequestBody @Valid SaveUser saveDto){
 
         try{
             GetUser updatedUser = userService.updateOneByUsername(username, saveDto);

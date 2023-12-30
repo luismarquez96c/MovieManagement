@@ -1,6 +1,7 @@
 package net.luismarquez.projects.MovieManagement.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveMovie;
 import net.luismarquez.projects.MovieManagement.dto.response.GetMovie;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
@@ -57,9 +58,10 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<GetMovie> createOne(@RequestBody SaveMovie saveDto,
+    public ResponseEntity<GetMovie> createOne(@RequestBody @Valid SaveMovie saveDto,
                                            HttpServletRequest request){
 
+//        System.out.println("Fecha: " + saveDto.availabilityEndTime());
         GetMovie movieCreated = movieService.createOne(saveDto);
 
         String baseUrl = request.getRequestURL().toString();
@@ -72,7 +74,7 @@ public class MovieController {
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<GetMovie> updateOneById(@PathVariable Long id,
-                                               @RequestBody SaveMovie saveDto){
+                                                  @Valid @RequestBody SaveMovie saveDto){
         try{
             GetMovie updatedMovie = movieService.updateOneById(id, saveDto);
             return ResponseEntity.ok(updatedMovie);
