@@ -12,8 +12,10 @@ import net.luismarquez.projects.MovieManagement.service.UserService;
 import net.luismarquez.projects.MovieManagement.service.validator.PasswordValidator;
 import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -50,7 +52,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     private User findOneEntityByUsername(String username) {
         return userCrudRepository.findByUsername(username)
-                .orElseThrow( () -> new ObjectNotFoundException("[user:" + username + "]"));
+                .orElseThrow( () ->  new ResponseStatusException(HttpStatusCode.valueOf(404), "User not found: " + username));
+//                .orElseThrow( () -> new ObjectNotFoundException("[user:" + username + "]"));
     }
 
     @Override
