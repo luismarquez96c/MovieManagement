@@ -57,24 +57,14 @@ public class UserController {
     @PutMapping(value = "/{username}")
     public ResponseEntity<GetUser> updateOneByUsername(@PathVariable String username,
                                                     @RequestBody @Valid SaveUser saveDto){
-
-        try{
-            GetUser updatedUser = userService.updateOneByUsername(username, saveDto);
-            return ResponseEntity.ok(updatedUser);
-        }catch (ObjectNotFoundException exception){
-            return ResponseEntity.notFound().build();
-        }
-
+        GetUser updatedUser = userService.updateOneByUsername(username, saveDto);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping(value = "{username}")
     public ResponseEntity<Void> deleteOneByUsername(@PathVariable String username){
-        try{
-            userService.deleteOneByUsername(username);
-            return ResponseEntity.noContent().build();
-        }catch (ObjectNotFoundException exception){
-            return ResponseEntity.notFound().build();
-        }
+        userService.deleteOneByUsername(username);
+        return ResponseEntity.noContent().build();
     }
 
 }

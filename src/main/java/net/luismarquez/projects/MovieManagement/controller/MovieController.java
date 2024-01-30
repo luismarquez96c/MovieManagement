@@ -1,9 +1,12 @@
 package net.luismarquez.projects.MovieManagement.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveMovie;
+import net.luismarquez.projects.MovieManagement.dto.response.ApiError;
 import net.luismarquez.projects.MovieManagement.dto.response.GetMovie;
+import net.luismarquez.projects.MovieManagement.exception.InvalidPasswordException;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import net.luismarquez.projects.MovieManagement.service.MovieService;
@@ -15,9 +18,15 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,25 +80,14 @@ public class MovieController {
     @PutMapping(value = "/{id}")
     public ResponseEntity<GetMovie> updateOneById(@PathVariable Long id,
                                                   @Valid @RequestBody SaveMovie saveDto){
-        try{
-            GetMovie updatedMovie = movieService.updateOneById(id, saveDto);
-            return ResponseEntity.ok(updatedMovie);
-        }catch (ObjectNotFoundException exception){
-            return ResponseEntity.notFound().build();
-        }
-
+        GetMovie updatedMovie = movieService.updateOneById(id, saveDto);
+        return ResponseEntity.ok(updatedMovie);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteOneById(@PathVariable Long id){
-
-        try{
-            movieService.deleteOneById(id);
-            return ResponseEntity.noContent().build();
-        }catch (ObjectNotFoundException exception){
-            return ResponseEntity.notFound().build();
-        }
-
+        movieService.deleteOneById(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
