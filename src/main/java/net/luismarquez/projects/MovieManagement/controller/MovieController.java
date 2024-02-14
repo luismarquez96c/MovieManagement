@@ -3,12 +3,14 @@ package net.luismarquez.projects.MovieManagement.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import net.luismarquez.projects.MovieManagement.dto.request.MovieSearchCriteria;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveMovie;
 import net.luismarquez.projects.MovieManagement.dto.response.ApiError;
 import net.luismarquez.projects.MovieManagement.dto.response.GetMovie;
 import net.luismarquez.projects.MovieManagement.exception.InvalidPasswordException;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
+import net.luismarquez.projects.MovieManagement.persistence.specification.FindAllMoviesSpecification;
 import net.luismarquez.projects.MovieManagement.service.MovieService;
 import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,20 +42,13 @@ public class MovieController {
 
     @GetMapping
     public ResponseEntity<List<GetMovie>> findAll(@RequestParam(required = false) String title,
-                                                  @RequestParam(required = false) MovieGenre genre){
+                                                  @RequestParam(required = false) MovieGenre genre,
+                                                  @RequestParam(required = false, name = "min_release_year") Integer minReleaseYear,
+                                                  @RequestParam(required = false, name = "max_release_year") Integer maxReleaseYear,
+                                                  @RequestParam(required = false, name = "min_average_rating") Integer minAverageRating){
 
-        List<GetMovie> movies = null;
-
-        if(StringUtils.hasText(title) && genre != null ){
-            movies = movieService.findAllByGenreAndTitle(genre, title);
-        }else if(StringUtils.hasText(title)){
-            movies = movieService.findAllByTitle(title);
-        }else if(genre != null){
-            movies = movieService.findAllByGenre(genre);
-        }else{
-            movies = movieService.findAll();
-        }
-
+        MovieSearchCriteria searchCriteria = new MovieSearchCriteria(title, genre, minReleaseYear, maxReleaseYear, minAverageRating);
+        List<GetMovie> movies = movieService.findAll(searchCriteria);
         return ResponseEntity.ok(movies);
     }
 
