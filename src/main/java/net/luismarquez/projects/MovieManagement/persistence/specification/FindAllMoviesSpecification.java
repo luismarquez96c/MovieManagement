@@ -28,17 +28,15 @@ public class FindAllMoviesSpecification implements Specification<Movie> {
 
         List<Predicate> predicates = new ArrayList<>();
 
+        if(StringUtils.hasText(this.searchCriteria.title())){
+            Predicate titleLike = criteriaBuilder.like(root.get("title"), "%" + this.searchCriteria.title() + "%");
+            //m.title like '%asdasdasd%'
+            predicates.add(titleLike);
+        }
+
         if(this.searchCriteria.genres() != null && this.searchCriteria.genres().length > 0){
-
-            List<Predicate> genrePredicates = new ArrayList<>();
-
-            for(MovieGenre genre : this.searchCriteria.genres()){
-                Predicate genreEqual = criteriaBuilder.equal(root.get("genre"), genre);
-                genrePredicates.add(genreEqual);
-            }
-
-            Predicate genreEqual = criteriaBuilder.or(genrePredicates.toArray(new Predicate[0]));
-            //and (m.genre = ?2.1 OR m.genre = ?2.2 OR m.genre = ?2.3 OR m.genre = ?2.4)
+            Predicate genreEqual = criteriaBuilder.in(root.get("genre")).value(Arrays.stream(this.searchCriteria.genres()).toList());
+            //and m.genre in (?,?,?)
             predicates.add(genreEqual);
         }
 
@@ -61,20 +59,13 @@ public class FindAllMoviesSpecification implements Specification<Movie> {
             predicates.add(averageRatingGreaterThanEqual);
         }
 
-        Predicate predicatesWithAnd = criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        if(StringUtils.hasText(this.searchCriteria.title())){
-            Predicate titleLike = criteriaBuilder.like(root.get("title"), "%" + this.searchCriteria.title() + "%");
-            //m.title like '%asdasdasd%'
-            return criteriaBuilder.or(titleLike, predicatesWithAnd);
-        }
-
-        return predicatesWithAnd;
+        return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
 
         // select m.*
         // from movie m
         // where 1 = 1  and
         //              m.title like '%?1%'
-        //              OR (m.genre = ?2.1 or m.genre = ?2.2 or m.genre = ?2.3)
+        //              and m.genre in (?,?,?)
         //              and m.releaseYear >= ?3
         //              and m.releaseYear <= ?4
         //              and (select avg(r1_0.rating)  from rating r1_0 where r1_0.movie_id = m1_0.id)
