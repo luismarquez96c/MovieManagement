@@ -4,10 +4,12 @@ import jakarta.persistence.criteria.*;
 import net.luismarquez.projects.MovieManagement.dto.request.MovieSearchCriteria;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Rating;
+import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FindAllMoviesSpecification implements Specification<Movie> {
@@ -24,49 +26,58 @@ public class FindAllMoviesSpecification implements Specification<Movie> {
         //query = criterios de la consulta en si misma
         //criteriaBuilder = fabrica que te permite construir predicados y expresiones
 
-        List<Predicate> predicatesWithAnd = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>();
 
-        if(StringUtils.hasText(this.searchCriteria.title())){
-            Predicate titleLike = criteriaBuilder.like(root.get("title"), "%" + this.searchCriteria.title() + "%");
-            //m.title like '%asdasdasd%'
-            predicatesWithAnd.add(titleLike);
-        }
+        if(this.searchCriteria.genres() != null && this.searchCriteria.genres().length > 0){
 
-        if(this.searchCriteria.genre() != null){
-            Predicate genreEqual = criteriaBuilder.equal(root.get("genre"), this.searchCriteria.genre());
-            //m.genre = ?
-            predicatesWithAnd.add(genreEqual);
+            List<Predicate> genrePredicates = new ArrayList<>();
+
+            for(MovieGenre genre : this.searchCriteria.genres()){
+                Predicate genreEqual = criteriaBuilder.equal(root.get("genre"), genre);
+                genrePredicates.add(genreEqual);
+            }
+
+            Predicate genreEqual = criteriaBuilder.or(genrePredicates.toArray(new Predicate[0]));
+            //and (m.genre = ?2.1 OR m.genre = ?2.2 OR m.genre = ?2.3 OR m.genre = ?2.4)
+            predicates.add(genreEqual);
         }
 
         if(this.searchCriteria.minReleaseYear() != null && this.searchCriteria.minReleaseYear().intValue() > 0){
             Predicate releaseYearGreaterThanEqual = criteriaBuilder.greaterThanOrEqualTo(root.get("releaseYear"), this.searchCriteria.minReleaseYear());
             // m.releaseYear >= ?
-            predicatesWithAnd.add(releaseYearGreaterThanEqual);
+            predicates.add(releaseYearGreaterThanEqual);
         }
 
         if(this.searchCriteria.maxReleaseYear() != null && this.searchCriteria.maxReleaseYear() > 0){
             Predicate releaseYearLessThanEqual = criteriaBuilder.lessThanOrEqualTo(root.get("releaseYear"), this.searchCriteria.maxReleaseYear());
             //m.releaseYear <= ?
-            predicatesWithAnd.add(releaseYearLessThanEqual);
+            predicates.add(releaseYearLessThanEqual);
         }
 
         if(this.searchCriteria.minAverageRating() != null && this.searchCriteria.minAverageRating() > 0){
             Subquery<Double> averageRatingSubquery = getAverageRatingSubquery(root, query, criteriaBuilder);
 
             Predicate averageRatingGreaterThanEqual = criteriaBuilder.greaterThanOrEqualTo(averageRatingSubquery, this.searchCriteria.minAverageRating().doubleValue());
-            predicatesWithAnd.add(averageRatingGreaterThanEqual);
+            predicates.add(averageRatingGreaterThanEqual);
         }
 
-        return criteriaBuilder.and(predicatesWithAnd.toArray(new Predicate[0]));
+        Predicate predicatesWithAnd = criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        if(StringUtils.hasText(this.searchCriteria.title())){
+            Predicate titleLike = criteriaBuilder.like(root.get("title"), "%" + this.searchCriteria.title() + "%");
+            //m.title like '%asdasdasd%'
+            return criteriaBuilder.or(titleLike, predicatesWithAnd);
+        }
+
+        return predicatesWithAnd;
 
         // select m.*
         // from movie m
         // where 1 = 1  and
-        //              (m.title like '%?1%'
-        //              and m.genre = ?2
+        //              m.title like '%?1%'
+        //              OR (m.genre = ?2.1 or m.genre = ?2.2 or m.genre = ?2.3)
         //              and m.releaseYear >= ?3
-        //              and m.releaseYear <= ?4)
-        //              or (select avg(r1_0.rating)  from rating r1_0 where r1_0.movie_id = m1_0.id)
+        //              and m.releaseYear <= ?4
+        //              and (select avg(r1_0.rating)  from rating r1_0 where r1_0.movie_id = m1_0.id)
         //                      >= searchCriteria.minAverageRating()
 
 
