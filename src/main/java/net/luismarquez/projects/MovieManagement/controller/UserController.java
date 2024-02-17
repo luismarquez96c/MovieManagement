@@ -4,18 +4,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
-import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
-import net.luismarquez.projects.MovieManagement.persistence.entity.User;
 import net.luismarquez.projects.MovieManagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -25,16 +23,10 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<GetUser>> findAll(@RequestParam(required = false) String name){
+    public ResponseEntity<Page<GetUser>> findAll(@RequestParam(required = false) String name,
+                                                 Pageable pageable){
 
-        List<GetUser> users = null;
-
-        if(StringUtils.hasText(name)){
-            users = userService.findAllByName(name);
-        }else{
-            users = userService.findAll();
-        }
-
+        Page<GetUser> users = userService.findAll(name, pageable);
         return ResponseEntity.ok(users);
     }
 

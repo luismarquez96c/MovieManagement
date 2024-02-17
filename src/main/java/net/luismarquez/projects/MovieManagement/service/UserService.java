@@ -2,14 +2,12 @@ package net.luismarquez.projects.MovieManagement.service;
 
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
-import net.luismarquez.projects.MovieManagement.persistence.entity.User;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-    List<GetUser> findAll();
-    List<GetUser> findAllByName(String name);
+    Page<GetUser> findAll(String name, Pageable pageable);
     GetUser findOneByUsername(String username);
     GetUser saveOne(SaveUser saveDto);
     GetUser updateOneByUsername(String username, SaveUser saveDto);

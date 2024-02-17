@@ -1,5 +1,6 @@
 package net.luismarquez.projects.MovieManagement.service.impl;
 
+import jakarta.persistence.criteria.Predicate;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
@@ -12,9 +13,13 @@ import net.luismarquez.projects.MovieManagement.service.UserService;
 import net.luismarquez.projects.MovieManagement.service.validator.PasswordValidator;
 import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -31,16 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<GetUser> findAll() {
-        List<User> entites = userCrudRepository.findAll();
-        return UserMapper.toGetDtoList(entites);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<GetUser> findAllByName(String name) {
-        List<User> entities = userCrudRepository.findByNameContaining(name);
-        return UserMapper.toGetDtoList(entities);
+    public Page<GetUser> findAll(String name, Pageable pageable) {
+        Page<User> entities = userCrudRepository.findByNameContaining(name, pageable);
+        return entities.map(UserMapper::toGetDto);
     }
 
     @Transactional(readOnly = true)
