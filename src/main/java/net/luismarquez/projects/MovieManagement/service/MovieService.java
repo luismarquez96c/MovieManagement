@@ -3,19 +3,12 @@ package net.luismarquez.projects.MovieManagement.service;
 import net.luismarquez.projects.MovieManagement.dto.request.MovieSearchCriteria;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveMovie;
 import net.luismarquez.projects.MovieManagement.dto.response.GetMovie;
-import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
-import net.luismarquez.projects.MovieManagement.util.MovieGenre;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface MovieService {
 
-    List<GetMovie> findAll(MovieSearchCriteria searchCriteria);
-//    List<GetMovie> findAllByTitle(String title);
-//    List<GetMovie> findAllByGenre(MovieGenre genre);
-//    List<GetMovie> findAllByGenreAndTitle(MovieGenre genre, String title);
-//    List<GetMovie> findAllByGenreAndTitleAndMinReleaseYear(MovieGenre genre, String title, Integer minReleaseYear);
-
+    Page<GetMovie> findAll(MovieSearchCriteria searchCriteria, Pageable pageable);
     GetMovie findOneById(Long id);
     GetMovie createOne(SaveMovie saveDto);
     GetMovie updateOneById(Long id, SaveMovie saveDto);

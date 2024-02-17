@@ -14,6 +14,10 @@ import net.luismarquez.projects.MovieManagement.persistence.specification.FindAl
 import net.luismarquez.projects.MovieManagement.service.MovieService;
 import net.luismarquez.projects.MovieManagement.util.MovieGenre;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -41,14 +45,19 @@ public class MovieController {
 
 
     @GetMapping
-    public ResponseEntity<List<GetMovie>> findAll(@RequestParam(required = false) String title,
+    public ResponseEntity<Page<GetMovie>> findAll(@RequestParam(required = false) String title,
                                                   @RequestParam(required = false) MovieGenre[] genres,
                                                   @RequestParam(required = false, name = "min_release_year") Integer minReleaseYear,
                                                   @RequestParam(required = false, name = "max_release_year") Integer maxReleaseYear,
-                                                  @RequestParam(required = false, name = "min_average_rating") Integer minAverageRating){
+                                                  @RequestParam(required = false, name = "min_average_rating") Integer minAverageRating,
+                                                  @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                  @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                                  @RequestParam(required = false, defaultValue = "id") String sortBy ){
 
+        Sort movieSort = Sort.by(sortBy.trim());
+        Pageable moviePagable = PageRequest.of(pageNumber, pageSize, movieSort);
         MovieSearchCriteria searchCriteria = new MovieSearchCriteria(title, genres, minReleaseYear, maxReleaseYear, minAverageRating);
-        List<GetMovie> movies = movieService.findAll(searchCriteria);
+        Page<GetMovie> movies = movieService.findAll(searchCriteria, moviePagable);
         return ResponseEntity.ok(movies);
     }
 
