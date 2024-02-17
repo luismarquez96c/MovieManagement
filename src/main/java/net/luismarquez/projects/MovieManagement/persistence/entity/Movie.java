@@ -88,4 +88,16 @@ public class Movie {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", director='" + director + '\'' +
+                ", genre=" + genre +
+                ", releaseYear=" + releaseYear +
+                '}';
+    }
 }
+
