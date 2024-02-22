@@ -29,7 +29,8 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class,
             HttpRequestMethodNotSupportedException.class,
             HttpMediaTypeNotSupportedException.class,
-            HttpMessageNotReadableException.class
+            HttpMessageNotReadableException.class,
+            DuplicateRatingException.class
     })
     public ResponseEntity<ApiError> handleAllExceptions(Exception exception,
                                                             HttpServletRequest request,
@@ -56,11 +57,28 @@ public class GlobalExceptionHandler {
             return this.handleHttpMediaTypeNotSupportedException(httpMediaTypeNotSupportedException, request, response, timestamp);
         }else if(exception instanceof HttpMessageNotReadableException httpMessageNotReadableException){
             return this.handleHttpMessageNotReadableException(httpMessageNotReadableException, request, response, timestamp);
+        }else if(exception instanceof DuplicateRatingException duplicateRatingException){
+            return this.handleDuplicateRatingException(duplicateRatingException, request, response, timestamp);
         }
         else {
             return this.handleException(exception, request, response, timestamp);
 
         }
+    }
+
+    private ResponseEntity<ApiError> handleDuplicateRatingException(DuplicateRatingException duplicateRatingException, HttpServletRequest request, HttpServletResponse response, LocalDateTime timestamp) {
+        int httpStatus = HttpStatus.CONFLICT.value();
+        ApiError apiError = new ApiError(
+                httpStatus,
+                request.getRequestURL().toString(),
+                request.getMethod(),
+                duplicateRatingException.getMessage(),
+                duplicateRatingException.getMessage(),
+                timestamp,
+                null
+        );
+
+        return ResponseEntity.status(httpStatus).body(apiError);
     }
 
     private ResponseEntity<ApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException httpMessageNotReadableException, HttpServletRequest request, HttpServletResponse response, LocalDateTime timestamp) {

@@ -1,17 +1,21 @@
 package net.luismarquez.projects.MovieManagement.service;
 
+import net.luismarquez.projects.MovieManagement.dto.request.SaveRating;
+import net.luismarquez.projects.MovieManagement.dto.response.GetCompleteRating;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Rating;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface RatingService {
 
-    List<Rating> findAll();
-    List<Rating> findAllByMovieId(Long movieId);
-    List<Rating> findAllByUsername(String username);
-    Rating findOneById(Long id);
-    Rating createOne(Rating rating);
-    Rating updateOneById(Long id, Rating rating);
+    Page<GetCompleteRating> findAll(Pageable pageable);
+    Page<GetCompleteRating> findAllByMovieId(Long movieId, Pageable pageable);
+    Page<GetCompleteRating> findAllByUsername(String username, Pageable pageable);
+    GetCompleteRating findOneById(Long id);
+    GetCompleteRating createOne(SaveRating saveDto);
+    GetCompleteRating updateOneById(Long id, SaveRating saveDto);
     void deleteOneById(Long id);
 
 }

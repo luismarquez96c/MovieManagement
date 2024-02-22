@@ -48,7 +48,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(readOnly = true)
-    private User findOneEntityByUsername(String username) {
+    @Override
+    public User findOneEntityByUsername(String username) {
         return userCrudRepository.findByUsername(username)
                 .orElseThrow( () -> new ObjectNotFoundException("[user:" + username + "]"));
     }
