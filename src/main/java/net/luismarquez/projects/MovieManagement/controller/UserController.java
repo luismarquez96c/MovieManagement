@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
+import net.luismarquez.projects.MovieManagement.dto.response.GetUserStatistic;
+import net.luismarquez.projects.MovieManagement.service.RatingService;
 import net.luismarquez.projects.MovieManagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RatingService ratingService;
+
     @GetMapping
     public ResponseEntity<Page<GetUser>> findAll(@RequestParam(required = false) String name,
                                                  Pageable pageable){
@@ -31,9 +36,15 @@ public class UserController {
     }
 
     @GetMapping(value = "/{user}")
-    public ResponseEntity<GetUser> findOneByUsername(@PathVariable("user") String username ){
+    public ResponseEntity<GetUserStatistic> findOneByUsername(@PathVariable("user") String username ){
         return ResponseEntity.ok(userService.findOneByUsername(username));
     }
+
+    @GetMapping(value = "/{username}/ratings")
+    public ResponseEntity<Page<GetUser.GetRating>> findAllRatingsForUserByUsername(@PathVariable String username, Pageable pageable){
+        return ResponseEntity.ok(ratingService.findAllByUsername(username, pageable));
+    }
+
 
     @PostMapping
     public ResponseEntity<GetUser> createOne(@RequestBody @Valid SaveUser saveDto,

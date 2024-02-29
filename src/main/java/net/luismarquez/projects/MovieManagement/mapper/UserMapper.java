@@ -2,19 +2,36 @@ package net.luismarquez.projects.MovieManagement.mapper;
 
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
+import net.luismarquez.projects.MovieManagement.dto.response.GetUserStatistic;
 import net.luismarquez.projects.MovieManagement.persistence.entity.User;
 
 import java.util.List;
 
 public class UserMapper {
 
+    public static GetUserStatistic toGetStatisticDto(User entity, int totalRatings,
+                                                     double averageRating, int lowestRating,
+                                                     int highestRating) {
+        if(entity == null) return null;
+
+        return new GetUserStatistic(
+                entity.getUsername(),
+                entity.getCreatedAt(),
+                totalRatings,
+                averageRating,
+                lowestRating,
+                highestRating
+        );
+    }
+
     public static GetUser toGetDto(User entity){
         if(entity == null) return null;
 
+        int totalRatings = entity.getRatings() != null ? entity.getRatings().size() : 0;
         return new GetUser(
                 entity.getUsername(),
                 entity.getName(),
-                RatingMapper.toGetUserRatingDtoList(entity.getRatings())
+                totalRatings
         );
     }
 

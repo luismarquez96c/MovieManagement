@@ -3,11 +3,13 @@ package net.luismarquez.projects.MovieManagement.service.impl;
 import jakarta.persistence.criteria.Predicate;
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
+import net.luismarquez.projects.MovieManagement.dto.response.GetUserStatistic;
 import net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException;
 import net.luismarquez.projects.MovieManagement.mapper.UserMapper;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import net.luismarquez.projects.MovieManagement.persistence.entity.User;
 import net.luismarquez.projects.MovieManagement.persistence.repository.MovieCrudRepository;
+import net.luismarquez.projects.MovieManagement.persistence.repository.RatingCrudRepository;
 import net.luismarquez.projects.MovieManagement.persistence.repository.UserCrudRepository;
 import net.luismarquez.projects.MovieManagement.service.UserService;
 import net.luismarquez.projects.MovieManagement.service.validator.PasswordValidator;
@@ -32,6 +34,9 @@ public class UserServiceImpl implements UserService {
     private UserCrudRepository userCrudRepository;
 
     @Autowired
+    private RatingCrudRepository ratingCrudRepository;
+
+    @Autowired
     private MovieCrudRepository movieCrudRepository;
 
     @Transactional(readOnly = true)
@@ -43,8 +48,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public GetUser findOneByUsername(String username) {
-        return UserMapper.toGetDto(this.findOneEntityByUsername(username));
+    public GetUserStatistic findOneByUsername(String username) {
+
+        int totalRatings = ratingCrudRepository.countByUserUsername(username);
+        double averageRating = ratingCrudRepository.avgRatingByUsername(username);
+        int lowestRating = ratingCrudRepository.minRatingByUsername(username);
+        int highestRating = ratingCrudRepository.maxRatingByUsername(username);
+
+        return UserMapper.toGetStatisticDto(this.findOneEntityByUsername(username), totalRatings, averageRating, lowestRating, highestRating);
     }
 
     @Transactional(readOnly = true)

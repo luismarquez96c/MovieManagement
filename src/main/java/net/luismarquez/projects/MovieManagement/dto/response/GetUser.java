@@ -8,7 +8,7 @@ import java.util.List;
 public record GetUser(
         String username,
         String name,
-        List<GetRating> ratings
+        @JsonProperty("total_ratings") int totalRatings
 ) implements Serializable {
 
     public static record GetRating(

@@ -2,6 +2,8 @@ package net.luismarquez.projects.MovieManagement.mapper;
 
 import net.luismarquez.projects.MovieManagement.dto.request.SaveMovie;
 import net.luismarquez.projects.MovieManagement.dto.response.GetMovie;
+import net.luismarquez.projects.MovieManagement.dto.response.GetMovieStatistic;
+import net.luismarquez.projects.MovieManagement.dto.response.GetUserStatistic;
 import net.luismarquez.projects.MovieManagement.persistence.entity.Movie;
 import org.springframework.stereotype.Component;
 
@@ -9,8 +11,28 @@ import java.util.List;
 
 public class MovieMapper {
 
+    public static GetMovieStatistic toGetMovieStatisticDto(Movie entity, int totalRatings,
+                                                           double averageRating, int lowestRating,
+                                                           int highestRating){
+        if(entity == null) return null;
+
+        return new GetMovieStatistic(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getDirector(),
+                entity.getGenre(),
+                totalRatings,
+                entity.getReleaseYear(),
+                averageRating,
+                lowestRating,
+                highestRating
+        );
+    }
+
     public static GetMovie toGetDto(Movie entity){
         if(entity == null) return null;
+
+        int totalRatings = entity.getRatings() != null ? entity.getRatings().size() : 0;
 
         return new GetMovie(
                 entity.getId(),
@@ -18,7 +40,7 @@ public class MovieMapper {
                 entity.getDirector(),
                 entity.getGenre(),
                 entity.getReleaseYear(),
-                RatingMapper.toGetMovieRatingDtoList(entity.getRatings())
+                totalRatings
         );
 
     }

@@ -2,6 +2,7 @@ package net.luismarquez.projects.MovieManagement.service;
 
 import net.luismarquez.projects.MovieManagement.dto.request.SaveUser;
 import net.luismarquez.projects.MovieManagement.dto.response.GetUser;
+import net.luismarquez.projects.MovieManagement.dto.response.GetUserStatistic;
 import net.luismarquez.projects.MovieManagement.persistence.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ public interface UserService {
      * @throws {@link net.luismarquez.projects.MovieManagement.exception.ObjectNotFoundException} if the given username do not exist
      * @return
      */
-    GetUser findOneByUsername(String username);
+    GetUserStatistic findOneByUsername(String username);
 
     /**
      * @param username
