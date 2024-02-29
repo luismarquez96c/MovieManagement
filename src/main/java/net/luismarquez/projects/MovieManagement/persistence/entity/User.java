@@ -26,8 +26,11 @@ public class User {
     @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT NOW()")
     private LocalDateTime createdAt;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Rating> ratings;
+
+    //soft delete: no se borra el registro, no se oculta con un campo llamado status
+    //private UserStatus status;
 
     public Long getId() {
         return id;
